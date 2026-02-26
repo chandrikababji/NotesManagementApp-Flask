@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - NotesNest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/register.css">
+</head>
+<body>
+
+<a href="/" class="register-back-btn">Back</a>
+
+<div class="register-container">
+    {% with messages = get_flashed_messages() %}    
+  {% if messages %}
+    {% for message in messages %}
+      <p style="color: white;">{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+    <h1 class="register-title">NotesNest</h1>
+    <h2 class="register-subtitle">Create Account</h2>
+      
+    <form method="post">
+    <input type="text" name="uname" placeholder="Username" class="register-input">
+    <input type="email" name="email" placeholder="Email" class="register-input">
+    <input type="password" name="password" placeholder="Password" class="register-input">
+    <button type="submit" class="register-button">Register</button>
+    </form>
+</div>
+
+</body>
+</html>

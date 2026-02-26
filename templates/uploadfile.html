@@ -1,0 +1,18 @@
+{% extends 'dashboard.html' %}
+{% block title %}Upload - NotesNest {% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block addcss %}<link rel="stylesheet" href="{{ url_for('static', filename='uploadfile.css') }}"> {% endblock %}
+
+{% block content %}
+
+    <div class="upload-container">
+        <h1>Upload Your File</h1>
+
+        <form method="post">
+            <label>File</label>
+            <input type="file" name="file" required>
+            <button type="submit" class="upload-btn">Upload File</button>
+        </form>
+    </div>
+
+{% endblock %}

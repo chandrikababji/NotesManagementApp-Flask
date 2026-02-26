@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP - NotesNest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/otpverification.css">
+</head>
+<body>
+
+<a href="/" class="otp-back-btn">Back</a>
+
+<div class="otp-container">
+{% with messages = get_flashed_messages() %}    
+  {% if messages %}
+    {% for message in messages %}
+      <p style="color: white;">{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+    <h1 class="otp-title">NotesNest</h1>
+    <h2 class="otp-subtitle">Enter OTP</h2>
+      <form method="POST">
+    <input type="text" name="otp" placeholder="Enter OTP" class="otp-input">
+    <button class="otp-button">Verify</button>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #000000, #1a0000);
+    color: white;
+}
+
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: black;
+    border-bottom: 2px solid red;
+    box-shadow: 0 0 15px red;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+
+.navbar > div:first-child {
+    font-size: 22px;
+    font-weight: bold;
+    color: red;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px red;
+}
+
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown > a {
+    text-decoration: none;
+    color: white;
+    padding: 8px 12px;
+    transition: 0.3s;
+}
+
+.dropdown > a:hover {
+    color: red;
+}
+
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: black;
+    min-width: 180px;
+    border: 1px solid red;
+    border-radius: 8px;
+    box-shadow: 0 0 15px red;
+    margin-top: 10px;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: white;
+    transition: 0.3s;
+}
+
+.dropdown-content a:hover {
+    background: red;
+    color: black;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+
+.search-box {
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid red;
+    background: black;
+    color: white;
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-box:focus {
+    box-shadow: 0 0 10px red;
+}
+
+.nav-links > a {
+    text-decoration: none;
+    color: white;
+    padding: 8px 12px;
+    border: 1px solid red;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+.nav-links > a:hover {
+    background: red;
+    color: black;
+    box-shadow: 0 0 15px red;
+}
+.main-content {
+    padding: 30px;
+    margin-top: 80px;
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard-NotesNest{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    {% block addcss %}{% endblock %}
+<body>
+<div class="navbar">
+    <div>NotesNest</div>
+
+    <p style="color: antiquewhite;">{{session.get('user')}}</p>
+    <div class="nav-links">
+        <div class="dropdown">
+            <a href="#">Notes</a>
+            <div class="dropdown-content">
+                <a href="{{url_for('addnotes')}}">Add Notes</a>
+                <a href="{{url_for('viewallnotes')}}">View All Notes</a>
+                <a href="{{url_for('excelsheet')}}">Excel Sheet</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#">Files</a>
+            <div class="dropdown-content">
+                <a href="{{url_for('uploadfile')}}">Upload File</a>
+                <a href="{{url_for('viewallfiles')}}">View All Files</a>
+            </div>
+        </div>
+
+        <input type="text" class="search-box" placeholder="Search">
+
+        <a href="{{ url_for('userlogin') }}">Logout</a>
+    </div>
+</div>
+ {% with messages = get_flashed_messages() %}    
+  {% if messages %}
+    {% for message in messages %}
+      <p style="color: white;">{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+<div class="main-content">
+    {% block content %}{% endblock %}
+</div>
+</body>

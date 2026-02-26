@@ -1,0 +1,29 @@
+{% extends 'dashboard.html' %}
+{% block title %}ViewAllNotes-NotesNest{% endblock %}
+{% block addcss %}
+<link rel="stylesheet" href="{{ url_for('static', filename='viewallnotes.css') }}">
+{% endblock %}
+{% block content %}
+<h2>All Notes</h2>
+<table>
+    <tr>
+        <th>NID</th>
+        <th>Title</th>
+        <th>Created At</th>
+        <th>Edits</th>
+        <th>Edits</th>
+        <th>Edits</th>
+    </tr>
+    {% for i in notesdata %}
+    <tr>
+        <td>{{ i[0] }}</td>
+        <td>{{ i[1] }}</td>
+        <td>{{ i[2] }}</td>
+        <td><a href="#">View</a></td>
+        <td><a href="#">Update</a></td>
+        <td><a href="#">Delete</a></td>
+    </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}

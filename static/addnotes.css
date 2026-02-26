@@ -1,0 +1,76 @@
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #000000;  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.addnotes-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.addnotes-block {
+    background-color: #111111;  
+    padding: 40px;
+    border-radius: 10px;
+    width: 350px;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); 
+    text-align: center;
+}
+
+
+.addnotes-block h2 {
+    color: #ff0000; 
+    margin-bottom: 20px;
+}
+
+
+.addnotes-block input,
+.addnotes-block textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ff0000;
+    background-color: #000000;
+    color: white;
+    border-radius: 5px;
+    outline: none;
+}
+
+.addnotes-block input::placeholder,
+.addnotes-block textarea::placeholder {
+    color: #bbbbbb;
+}
+
+
+.addnotes-block input:focus,
+.addnotes-block textarea:focus {
+    border: 1px solid #ff3333;
+    box-shadow: 0 0 8px #ff0000;
+}
+
+.addnotes-block button {
+    width: 100%;
+    padding: 10px;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.addnotes-block button:hover {
+    background-color: #cc0000;
+    box-shadow: 0 0 10px #ff0000;
+}

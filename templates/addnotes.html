@@ -1,0 +1,16 @@
+{% extends 'dashboard.html' %}
+{% block title %}AddNotes-NotesNest{% endblock %}
+{% block addcss %}<link rel="stylesheet" href="{{ url_for('static', filename='addnotes.css') }}">{% endblock %}
+
+{% block content %}
+<div class="addnotes-wrapper">
+    <div class="addnotes-block form-container">
+        <form method="post">
+          <h2>Add Note</h2>
+          <input type="text" name='title'placeholder="Title">
+          <textarea rows="5" name="content" placeholder="Content"></textarea>
+          <button type="submit">Save Note</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
