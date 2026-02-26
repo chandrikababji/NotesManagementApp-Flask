@@ -5,6 +5,7 @@ from otp import generate_otp
 from cmail import send_mail
 from stoken import endata,dndata
 
+
 from mysql.connector import (connection)
 mydb=connection.MySQLConnection(user='root',host='localhost',password='root@0320',db='project2')
 
@@ -164,6 +165,87 @@ def viewallnotes():
     else:
         return render_template('viewallnotes.html',notesdata=notesdata)
     
+#viewnotesroute
+@app.route('/viewnotes/<nid>')
+def viewnotes(nid):
+    if not session.get('user'):
+       flash('pls login to view all notes')
+       return redirect(url_for('userlogin'))
+    try:    
+        cursor=mydb.cursor(buffered=True)
+        cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
+        user_id=cursor.fetchone()[0]  #(1,)
+        cursor.execute('select notesid,notes_title,notes_content,created_at from notedata where user_id=%s and notesid=%s',
+                       [user_id,nid])
+        notesdata=cursor.fetchone()
+        print(notesdata)
+        cursor.close()
+    except Exception as e:     
+        print(e)
+        flash('could not fetch notesdetails')
+        return redirect(url_for('dashboard'))
+    else:
+        return render_template('viewnotes.html',notesdata=notesdata) 
+    
+
+#delete route
+@app.route('/deletenotes/<nid>')
+def deletenotes(nid):
+    if not session.get('user'):
+        flash('Please login first')
+        return redirect(url_for('userlogin'))
+    try:
+        cursor = mydb.cursor(buffered=True)
+        cursor.execute('select userid FROM userdata WHERE useremail=%s',[session.get('user')])
+        user_id = cursor.fetchone()[0]
+        cursor.execute('delete FROM notedata WHERE user_id=%s AND notesid=%s',[user_id, nid])
+        mydb.commit()
+        cursor.close()
+    except Exception as e:
+        print(e)
+        flash('Could not delete note')
+        return redirect(url_for('dashboard'))
+    else:
+        flash('Note deleted successfully')
+        return redirect(url_for('viewallnotes'))
+
+#update route
+@app.route('/updatenotes/<nid>',methods=['GET','POST'])
+def updatenotes(nid):
+    if not session.get('user'):
+        flash('pls login to view all noteses')
+        return redirect(url_for('userlogin'))
+    try:
+        cursor=mydb.cursor(buffered=True)
+        cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
+        user_id=cursor.fetchone()[0] #(1,)
+        cursor.execute('select notesid,notes_title,notes_content,created_at from notedata where user_id=%s and notesid=%s',[user_id,nid]) #[(1,'anc','2026-02-23 2:56:2'),]
+        notesdata=cursor.fetchone() #(1,'python','programming','2026-24')
+        print(notesdata)
+        cursor.close()
+    except Exception as e:
+        print(e)
+        flash('could not fetch notesdetails')
+        return redirect(url_for('dashboard'))
+    else:
+        if request.method=='POST':
+            updated_title=request.form['title'] 
+            updated_content=request.form['content']
+            try:
+                cursor=mydb.cursor(buffered=True)
+                cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
+                user_id=cursor.fetchone()[0] #(1,)
+                cursor.execute('update notedata set notes_title=%s,notes_content=%s where notesid=%s and user_id=%s ',[updated_title,updated_content,nid,user_id])
+                mydb.commit()
+                cursor.close()
+            except Exception as e:
+                print(e)
+                flash('could not update notesdetails')
+                return redirect(url_for('viewallnotes'))
+            else:
+                return redirect(url_for('updatenotes',nid=nid))
+        return render_template('updatenotes.html',notesdata=notesdata) 
+        
 
 #upload file route
 @app.route('/uploadfile')

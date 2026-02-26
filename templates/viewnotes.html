@@ -1,11 +1,11 @@
 {% extends 'dashboard.html' %}
-{% block title %}AddNotes-NotesNest{% endblock %}
+{% block title %}ViewNotes-NotesNest{% endblock %}
 {% block addcss %}<link rel="stylesheet" href="{{ url_for('static', filename='addnotes.css') }}">{% endblock %}
 
 {% block content %}
 <div class="addnotes-wrapper">
     <div class="addnotes-block form-container">
-        <form method="post">
+
 {% with messages = get_flashed_messages() %}    
   {% if messages %}
     {% for message in messages %}
@@ -13,11 +13,10 @@
     {% endfor %}
   {% endif %}
 {% endwith %}
-          <h2>Add Note</h2>
-          <input type="text" name='title'placeholder="Title">
-          <textarea rows="5" name="content" placeholder="Content"></textarea>
-          <button type="submit">Save Note</button>
-        </form>
+          <h2>View Note</h2>
+          <p>Created at : {{notesdata[3]}}</p>
+          <input type="text" name='title'placeholder="Title" value="{{notesdata[1]}}" readonly>
+          <textarea rows="5" name="content" placeholder="Content" readonly >{{notesdata[2]}}</textarea>
     </div>
 </div>
 {% endblock %}

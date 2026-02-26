@@ -19,9 +19,9 @@
         <td>{{ i[0] }}</td>
         <td>{{ i[1] }}</td>
         <td>{{ i[2] }}</td>
-        <td><a href="#">View</a></td>
-        <td><a href="#">Update</a></td>
-        <td><a href="#">Delete</a></td>
+      <td> <a href="{{ url_for('viewnotes', nid=i[0]) }}">View</a></td>
+        <td><a href="{{url_for('updatenotes',nid=i[0])}}">Update</a></td>
+        <td><a href="{{url_for('deletenotes',nid=i[0])}}">Delete</a></td>
     </tr>
     {% endfor %}
 

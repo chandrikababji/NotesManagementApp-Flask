@@ -1,5 +1,5 @@
 {% extends 'dashboard.html' %}
-{% block title %}AddNotes-NotesNest{% endblock %}
+{% block title %}UpdateNotes-NotesNest{% endblock %}
 {% block addcss %}<link rel="stylesheet" href="{{ url_for('static', filename='addnotes.css') }}">{% endblock %}
 
 {% block content %}
@@ -14,9 +14,9 @@
   {% endif %}
 {% endwith %}
           <h2>Add Note</h2>
-          <input type="text" name='title'placeholder="Title">
-          <textarea rows="5" name="content" placeholder="Content"></textarea>
-          <button type="submit">Save Note</button>
+          <input type="text" name='title'value="{{notesdata[1]}}">
+          <textarea rows="5" name="content" value="">{{notesdata[2]}}</textarea>
+          <button type="submit">Update Notes</button>
         </form>
     </div>
 </div>
