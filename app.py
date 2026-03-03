@@ -1,15 +1,18 @@
-from flask import Flask, request, redirect, url_for, render_template, make_response,flash,session
+from flask import Flask, request, redirect, url_for, render_template, make_response,flash,session,send_file
 from flask_session import Session
 from datetime import datetime
 from otp import generate_otp
 from cmail import send_mail
 from stoken import endata,dndata
+from io import BytesIO
+import flask_excel as excel
 
 
 from mysql.connector import (connection)
 mydb=connection.MySQLConnection(user='root',host='localhost',password='root@0320',db='project2')
 
 app = Flask(__name__)
+excel.init_excel(app)
 app.secret_key='code123'
 app.config['SESSION_TYPE']='filesystem'
 Session(app) #inetegration
@@ -248,21 +251,152 @@ def updatenotes(nid):
         
 
 #upload file route
-@app.route('/uploadfile')
+@app.route('/uploadfile',methods=['GET','POST'])
 def uploadfile():
-    return render_template('uploadfile.html')
+    if session.get('user'):
+        if request.method=='POST':
+            filedata=request.files['file']
+            fname=filedata.filename
+            f_data=filedata.read()
+            try:
+                cursor=mydb.cursor(buffered=True)
+                cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
+                user_id=cursor.fetchone()[0]
+                cursor.execute('insert into filedata(filename,filedata,user_id) values(%s,%s,%s)',[fname,f_data,user_id])
+                mydb.commit()
+                cursor.close()
+            except Exception as e:
+                print(e)
+                flash('Could not store filed data')
+                return redirect(url_for('uploadfile'))
+            else:
+                flash('file uploaded successfully')
+                return redirect(url_for('uploadfile'))
+
+        return render_template('uploadfile.html')
+    else:
+        flash('pls login to upload file')
+        return redirect(url_for('userlogin'))
+    
+
+
 
 #viewallfiles route
-@app.route('/viewallfiles')
+@app.route('/viewallfiles',methods=['GET','POST'])
 def viewallfiles():
-    return render_template('viewallfiles.html')
+    if not session.get('user'):
+        flash('pls login to view all noteses')
+        return redirect(url_for('userlogin'))
+    try:
+        cursor=mydb.cursor(buffered=True)
+        cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
+        user_id=cursor.fetchone()[0] #(1,)
+        cursor.execute('select fid,filename,created_at from filedata where user_id=%s',[user_id]) #[(1,'anc','2026-02-23 2:56:2'),]
+        allfilesdata=cursor.fetchall()
+        cursor.close()
+    except Exception as e:
+        print(e)
+        flash('could not fetch filesdetails')
+        return redirect(url_for('dashboard'))
+    else:
+        return render_template('viewallfiles.html',filesdata=allfilesdata)
 
+#viewfile route
+@app.route('/viewfile/<fid>')
+def viewfile(fid):
+    if not session.get('user'):
+       flash('pls login to view all notes')
+       return redirect(url_for('userlogin'))
+    try:    
+        cursor=mydb.cursor(buffered=True)
+        cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
+        user_id=cursor.fetchone()[0]  #(1,)
+        cursor.execute('select fid,filename,filedata,created_at from filedata where user_id=%s and fid=%s',
+                       [user_id,fid])
+        file_data=cursor.fetchone()
+        cursor.close()
+    except Exception as e:     
+        print(e)
+        flash('could not fetch filedetails')
+        return redirect(url_for('viewallfiles'))
+    else:
+        bytesdata=BytesIO(file_data[2])
+        return send_file(bytesdata,as_attachment=False,download_name=file_data[1])
+
+#download file route
+@app.route('/downloadfile/<fid>')
+def downloadfile(fid):
+    if not session.get('user'):
+       flash('pls login to view all notes')
+       return redirect(url_for('userlogin'))
+    try:    
+        cursor=mydb.cursor(buffered=True)
+        cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
+        user_id=cursor.fetchone()[0]  #(1,)
+        cursor.execute('select fid,filename,filedata,created_at from filedata where user_id=%s and fid=%s',
+                       [user_id,fid])
+        file_data=cursor.fetchone()
+        cursor.close()
+    except Exception as e:     
+        print(e)
+        flash('could not fetch filedetails')
+        return redirect(url_for('viewallfiles'))
+    else:
+        bytesdata=BytesIO(file_data[2])
+        return send_file(bytesdata,as_attachment=True,download_name=file_data[1])
+     
+   
+#deletefile route
+@app.route('/deletefile/<fid>')
+def deletefile(fid):
+    if not session.get('user'):
+        flash('Please login first')
+        return redirect(url_for('userlogin'))
+    try:
+        cursor = mydb.cursor(buffered=True)
+        cursor.execute('select userid FROM userdata WHERE useremail=%s',[session.get('user')])
+        user_id = cursor.fetchone()[0]
+        cursor.execute('delete FROM filedata WHERE fid=%s AND user_id=%s',[ fid,user_id])
+        mydb.commit()
+        cursor.close()
+    except Exception as e:
+        print(e)
+        flash('Could not delete file')
+        return redirect(url_for('dashboard'))
+    else:
+        flash('file deleted successfully')
+        return redirect(url_for('viewallfiles'))  
 
 #excel sheet route
-@app.route('/excelsheet')
-def excelsheet():
-    return render_template('excelsheet.html')
-
+@app.route('/getexceldata')
+def getexceldata():
+    if not session.get('user'):
+       flash('pls login to view all notes')
+       return redirect(url_for('userlogin'))
+    try:    
+        cursor=mydb.cursor(buffered=True)
+        cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
+        user_id=cursor.fetchone()[0]  #(1,)
+        cursor.execute('select notesid,notes_title,notes_content,created_at from notedata where user_id=%s',
+                       [user_id])
+        notesdata=cursor.fetchall()
+        cursor.close()
+    except Exception as e:     
+        print(e)
+        flash('could not fetch notesdetails')
+        return redirect(url_for('dashboard'))
+    else:
+        array_data=[list(i) for i in notesdata]
+        columns=['Notesid','Notes Title','Notes_Content','Created_at']
+        array_data.insert(0,columns)
+        print(array_data)
+        return excel.make_response_from_array(array_data,'xlsx',file_name='excel_data')
+    
+#logout route
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    flash("Logged out successfully")
 
 if __name__ == "__main__":
     app.run(debug=True)

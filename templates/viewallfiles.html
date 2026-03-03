@@ -1,11 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>See All of Your Recenet added files</h1>
-</body>
-</html>
+{% extends 'dashboard.html' %}
+{% block title %}ViewAllNotes-NotesNest{% endblock %}
+{% block addcss %}
+<link rel="stylesheet" href="{{ url_for('static', filename='viewallfiles.css') }}">
+{% endblock %}
+{% block content %}
+<h2>View All Files</h2>
+<table>
+    <tr>
+        <th>FID</th>
+        <th>FileName</th>
+        <th>Created At</th>
+        <th>Edits</th>
+        <th>Edits</th>
+        <th>Edits</th>
+    </tr>
+    {% for i in filesdata %}
+    <tr>
+        <td>{{ i[0] }}</td>
+        <td>{{ i[1] }}</td>
+        <td>{{ i[2] }}</td>
+      <td> <a href="{{url_for('viewfile',fid=i[0])}}" style="color: white;">View</a></td>
+        <td><a href="{{url_for('downloadfile',fid=i[0])}}" style="color: white;">Download</a></td>
+        <td><a href="{{url_for('deletefile',fid=i[0])}}" style="color: white;">Delete</a></td>
+    </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}

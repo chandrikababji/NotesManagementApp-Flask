@@ -1,0 +1,56 @@
+
+.files-container {
+    padding: 30px;
+}
+
+.files-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 26px;
+    color: #ff1a1a;
+}
+
+.files-container table {
+    width: 85%;
+    margin: auto;
+    border-collapse: collapse;
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+.files-container th {
+    background-color: #b30000;
+    color: white;
+    padding: 14px;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.files-container td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+    color: white;
+}
+
+.files-container tr:hover {
+    background-color: #262626;
+    transition: 0.3s;
+}
+
+.files-container a {
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    background-color: #ff1a1a;
+    color: white;
+    transition: 0.3s;
+}
+
+.files-container a:hover {
+    background-color: #b30000;
+}
