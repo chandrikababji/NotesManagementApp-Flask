@@ -26,10 +26,11 @@
                 <a href="{{url_for('viewallfiles')}}">View All Files</a>
             </div>
         </div>
+       <form method="POST" action="{{url_for('search')}}">
+        <input type="text" class="search-box" name="sdata" placeholder="enter search content">
+        </form>
 
-        <input type="text" class="search-box" placeholder="Search">
-
-        <a href="{{ url_for('userlogin') }}">Logout</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
     </div>
 </div>
 

@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, render_template, make_response,flash,session,send_file
+from flask import Flask, request, redirect, url_for, render_template, make_response,flash,session,send_file,jsonify
 from flask_session import Session
 from datetime import datetime
 from otp import generate_otp
@@ -6,6 +6,7 @@ from cmail import send_mail
 from stoken import endata,dndata
 from io import BytesIO
 import flask_excel as excel
+import re
 
 
 from mysql.connector import (connection)
@@ -392,11 +393,97 @@ def getexceldata():
         print(array_data)
         return excel.make_response_from_array(array_data,'xlsx',file_name='excel_data')
     
+#search route
+@app.route('/search',methods=['POST'])
+def search():
+    if session.get('user'):
+        search_data=request.form['sdata']
+        strg=['A-Za-z0-9']
+        pattern=re.compile(f'^{strg}',re.IGNORECASE)
+        if pattern.match(search_data):
+            try:    
+                cursor=mydb.cursor(buffered=True)
+                cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
+                user_id=cursor.fetchone()[0]  #(1,)
+                cursor.execute('select notesid,notes_title,notes_content,created_at from notedata where user_id=%s and (notes_title like %s or notes_content like %s or created_at like %s)',[user_id,search_data+'%',search_data+'%',search_data+'%'])
+                notesdata=cursor.fetchall()
+                cursor.close()
+            except Exception as e:     
+                print(e)
+                flash('could not fetch notesdetails')
+                return redirect(url_for('dashboard'))  
+            else:
+                return render_template('viewallnotes.html',notesdata=notesdata)  
+        else:
+            flash('invalid search data')
+            return redirect(url_for('dashboard'))
+        
+           
 #logout route
 @app.route('/logout')
 def logout():
-    session.pop('user', None)
-    flash("Logged out successfully")
+    if session.get('user'):
+        session.pop('user')
+        return redirect(url_for('userlogin'))
+    else:
+        flash('to logout you must login')
+        return redirect(url_for('userlogin'))
+
+#forgot password route
+@app.route('/forgotpwd',methods=['GET','POST'])
+def forgotpwd():
+    if request.method=='POST':
+        useremail=request.form['email']
+        try:
+            cursor=mydb.cursor(buffered=True)
+            cursor.execute('select count(*) from userdata where useremail=%s',[useremail])
+            email_count=cursor.fetchone()
+            cursor.close()
+        except Exception as e:
+            print(e)
+            flash('could not verify useremail')
+            return redirect(url_for('register'))
+        else:
+            if email_count[0]==1:
+                subject='Reset link for snm application'
+                body=f"use the given link for snm app {url_for('newpassword',data=endata(useremail),_external=True)}"
+                send_mail(to=useremail,body=body,subject=subject)
+                flash('Reset link has been sent to given mail')
+                return redirect(url_for('forgotpwd'))
+            elif email_count[0]==0:
+                flash('User Email not found')
+                return redirect(url_for('forgotpwd'))
+    return render_template('forgotpwd.html')
+
+#new password route
+@app.route('/newpassword/<data>',methods=['GET','PUT'])
+def newpassword(data):
+    if request.method=='PUT':
+        print(request.get_json())
+        npassword=request.get_json()['password']
+        try:
+            sdata=dndata(data)
+        except Exception as e:
+            print(e)
+            flash('could not verify email')
+            return redirect(url_for('newpassword',data=data))
+        else:
+            try:
+                cursor=mydb.cursor(buffered=True)
+                cursor.execute('update userdata set password=%s where useremail=%s',[npassword,sdata])
+                mydb.commit()
+                cursor.close()
+            except Exception as e:
+                print(e)
+                flash('Could not update password ')
+                return redirect(url_for('newpassword',data=data))
+            else:
+                flash('password successfull')
+                return jsonify({"message":"ok"})
+    return render_template('newpassword.html',data=data)
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
