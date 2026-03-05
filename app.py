@@ -10,17 +10,11 @@ import re
 import os
 import psycopg2
 
-DATABASE_URL = os.getenv("postgresql://postgres:zrKaBeBjBYbkkajUnnTMmmRxspvVxtWE@switchback.proxy.rlwy.net:39059/railway")
 
-conn = psycopg2.connect(DATABASE_URL)
-cursor = conn.cursor()
+DATABASE_URL = os.environ.get("DATABASE_URL")
+mydb = psycopg2.connect(DATABASE_URL)
 
-from mysql.connector import (connection)
-import dj_database_url
 
-DATABASES = {
-    'default': dj_database_url.config(default='postgresql://localhost')
-}
 
 app = Flask(__name__)
 excel.init_excel(app)
@@ -78,7 +72,7 @@ def otpverify(data_info):
             user_otp=request.form['otp']
             if sdata['server_otp']==user_otp:
                 try:
-                    cursor=mydb.cursor(buffered=True)
+                    cursor=mydb.cursor()
                     cursor.execute('insert into userdata(username,useremail,password) values (%s,%s,%s)',
                                    [sdata['username'],sdata['useremail'],sdata['userpassword']])
                     mydb.commit()  #to save changes in database permenantly
@@ -142,7 +136,7 @@ def addnotes():
         notes_title=request.form['title']
         notes_content=request.form['content']
         try:
-            cursor=mydb.cursor(buffered=True)
+            cursor=mydb.cursor()
             cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
             user_id=cursor.fetchone()[0]  #(1,)
             cursor.execute('insert into notedata(notes_title,notes_content,user_id) values(%s,%s,%s)',[notes_title,notes_content,user_id])
@@ -164,7 +158,7 @@ def viewallnotes():
        flash('pls login to view all notes')
        return redirect(url_for('userlogin'))
     try:    
-        cursor=mydb.cursor(buffered=True)
+        cursor=mydb.cursor()
         cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
         user_id=cursor.fetchone()[0]  #(1,)
         cursor.execute('select notesid,notes_title,created_at from notedata where user_id=%s',
@@ -186,7 +180,7 @@ def viewnotes(nid):
        flash('pls login to view all notes')
        return redirect(url_for('userlogin'))
     try:    
-        cursor=mydb.cursor(buffered=True)
+        cursor=mydb.cursor()
         cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
         user_id=cursor.fetchone()[0]  #(1,)
         cursor.execute('select notesid,notes_title,notes_content,created_at from notedata where user_id=%s and notesid=%s',
@@ -209,7 +203,7 @@ def deletenotes(nid):
         flash('Please login first')
         return redirect(url_for('userlogin'))
     try:
-        cursor = mydb.cursor(buffered=True)
+        cursor = mydb.cursor()
         cursor.execute('select userid FROM userdata WHERE useremail=%s',[session.get('user')])
         user_id = cursor.fetchone()[0]
         cursor.execute('delete FROM notedata WHERE user_id=%s AND notesid=%s',[user_id, nid])
@@ -230,7 +224,7 @@ def updatenotes(nid):
         flash('pls login to view all noteses')
         return redirect(url_for('userlogin'))
     try:
-        cursor=mydb.cursor(buffered=True)
+        cursor=mydb.cursor()
         cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
         user_id=cursor.fetchone()[0] #(1,)
         cursor.execute('select notesid,notes_title,notes_content,created_at from notedata where user_id=%s and notesid=%s',[user_id,nid]) #[(1,'anc','2026-02-23 2:56:2'),]
@@ -246,7 +240,7 @@ def updatenotes(nid):
             updated_title=request.form['title'] 
             updated_content=request.form['content']
             try:
-                cursor=mydb.cursor(buffered=True)
+                cursor=mydb.cursor()
                 cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
                 user_id=cursor.fetchone()[0] #(1,)
                 cursor.execute('update notedata set notes_title=%s,notes_content=%s where notesid=%s and user_id=%s ',[updated_title,updated_content,nid,user_id])
@@ -270,7 +264,7 @@ def uploadfile():
             fname=filedata.filename
             f_data=filedata.read()
             try:
-                cursor=mydb.cursor(buffered=True)
+                cursor=mydb.cursor()
                 cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
                 user_id=cursor.fetchone()[0]
                 cursor.execute('insert into filedata(filename,filedata,user_id) values(%s,%s,%s)',[fname,f_data,user_id])
@@ -299,7 +293,7 @@ def viewallfiles():
         flash('pls login to view all noteses')
         return redirect(url_for('userlogin'))
     try:
-        cursor=mydb.cursor(buffered=True)
+        cursor=mydb.cursor()
         cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
         user_id=cursor.fetchone()[0] #(1,)
         cursor.execute('select fid,filename,created_at from filedata where user_id=%s',[user_id]) #[(1,'anc','2026-02-23 2:56:2'),]
@@ -319,7 +313,7 @@ def viewfile(fid):
        flash('pls login to view all notes')
        return redirect(url_for('userlogin'))
     try:    
-        cursor=mydb.cursor(buffered=True)
+        cursor=mydb.cursor()
         cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
         user_id=cursor.fetchone()[0]  #(1,)
         cursor.execute('select fid,filename,filedata,created_at from filedata where user_id=%s and fid=%s',
@@ -341,7 +335,7 @@ def downloadfile(fid):
        flash('pls login to view all notes')
        return redirect(url_for('userlogin'))
     try:    
-        cursor=mydb.cursor(buffered=True)
+        cursor=mydb.cursor()
         cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
         user_id=cursor.fetchone()[0]  #(1,)
         cursor.execute('select fid,filename,filedata,created_at from filedata where user_id=%s and fid=%s',
@@ -364,7 +358,7 @@ def deletefile(fid):
         flash('Please login first')
         return redirect(url_for('userlogin'))
     try:
-        cursor = mydb.cursor(buffered=True)
+        cursor = mydb.cursor()
         cursor.execute('select userid FROM userdata WHERE useremail=%s',[session.get('user')])
         user_id = cursor.fetchone()[0]
         cursor.execute('delete FROM filedata WHERE fid=%s AND user_id=%s',[ fid,user_id])
@@ -385,7 +379,7 @@ def getexceldata():
        flash('pls login to view all notes')
        return redirect(url_for('userlogin'))
     try:    
-        cursor=mydb.cursor(buffered=True)
+        cursor=mydb.cursor()
         cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
         user_id=cursor.fetchone()[0]  #(1,)
         cursor.execute('select notesid,notes_title,notes_content,created_at from notedata where user_id=%s',
@@ -412,7 +406,7 @@ def search():
         pattern=re.compile(f'^{strg}',re.IGNORECASE)
         if pattern.match(search_data):
             try:    
-                cursor=mydb.cursor(buffered=True)
+                cursor=mydb.cursor()
                 cursor.execute('select userid from userdata where useremail=%s',[session.get('user')])
                 user_id=cursor.fetchone()[0]  #(1,)
                 cursor.execute('select notesid,notes_title,notes_content,created_at from notedata where user_id=%s and (notes_title like %s or notes_content like %s or created_at like %s)',[user_id,search_data+'%',search_data+'%',search_data+'%'])
@@ -445,7 +439,7 @@ def forgotpwd():
     if request.method=='POST':
         useremail=request.form['email']
         try:
-            cursor=mydb.cursor(buffered=True)
+            cursor=mydb.cursor()
             cursor.execute('select count(*) from userdata where useremail=%s',[useremail])
             email_count=cursor.fetchone()
             cursor.close()
@@ -479,7 +473,7 @@ def newpassword(data):
             return redirect(url_for('newpassword',data=data))
         else:
             try:
-                cursor=mydb.cursor(buffered=True)
+                cursor=mydb.cursor()
                 cursor.execute('update userdata set password=%s where useremail=%s',[npassword,sdata])
                 mydb.commit()
                 cursor.close()
