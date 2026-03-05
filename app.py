@@ -7,10 +7,20 @@ from stoken import endata,dndata
 from io import BytesIO
 import flask_excel as excel
 import re
+import os
+import psycopg2
 
+DATABASE_URL = os.getenv("postgresql://postgres:zrKaBeBjBYbkkajUnnTMmmRxspvVxtWE@switchback.proxy.rlwy.net:39059/railway")
+
+conn = psycopg2.connect(DATABASE_URL)
+cursor = conn.cursor()
 
 from mysql.connector import (connection)
-mydb=connection.MySQLConnection(user='root',host='localhost',password='root@0320',db='project2')
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(default='postgresql://localhost')
+}
 
 app = Flask(__name__)
 excel.init_excel(app)
@@ -486,6 +496,5 @@ def newpassword(data):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
