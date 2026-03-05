@@ -12,7 +12,11 @@ import psycopg2
 
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
-mydb = psycopg2.connect(DATABASE_URL)
+
+if DATABASE_URL:
+    mydb = psycopg2.connect(DATABASE_URL)
+else:
+    print("DATABASE_URL not found")
 
 
 
@@ -35,7 +39,7 @@ def register():
         useremail=request.form['email']
         userpassword=request.form['password']
         try:
-            cursor=mydb.cursor(buffered=True)
+            cursor=mydb.cursor()
             cursor.execute('select count(*) from userdata where useremail=%s',[useremail])
             email_count=cursor.fetchone()  #if method is fetchone it will shw like (1,) or (0,)  #if method is fetchall it will show details as list of tuples
             cursor.close()
@@ -95,7 +99,7 @@ def userlogin():
         login_useremail=request.form['useremail']
         login_password=request.form['password']
         try:
-            cursor=mydb.cursor(buffered=True)
+            cursor=mydb.cursor()
             cursor.execute('select count(*) from  userdata where useremail=%s',[login_useremail])
             email_count=cursor.fetchone()[0] #(1,) or (0,)
             print(email_count)
